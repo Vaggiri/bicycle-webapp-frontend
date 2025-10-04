@@ -4,12 +4,20 @@ import App from "./App";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 
+// Create context for color mode toggle
 export const ColorModeContext = React.createContext();
 
 function ThemeWrapper({ children }) {
+  // Default to dark mode if nothing is in localStorage
   const [mode, setMode] = React.useState(() => {
-    return localStorage.getItem("themeMode") || "light";
+    const savedMode = localStorage.getItem("themeMode");
+    if (!savedMode) {
+      localStorage.setItem("themeMode", "dark"); // ensure dark is saved
+    }
+    return savedMode || "dark";
   });
+
+  // Memoized color mode toggle function
   const colorMode = React.useMemo(
     () => ({
       toggleColorMode: () => {
@@ -22,6 +30,8 @@ function ThemeWrapper({ children }) {
     }),
     []
   );
+
+  // Create MUI theme based on current mode
   const theme = React.useMemo(
     () =>
       createTheme({
@@ -34,6 +44,7 @@ function ThemeWrapper({ children }) {
       }),
     [mode]
   );
+
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
@@ -44,6 +55,7 @@ function ThemeWrapper({ children }) {
   );
 }
 
+// Render the app
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <ThemeWrapper>
